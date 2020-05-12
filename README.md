@@ -1,2 +1,2 @@
 # tweet-sentiment
-Analyzing tweet sentiment. Spark, Kafka, Python.
+Analyzing tweet sentiment. Spark, Python.
