@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"
+  type="text/javascript" charset="utf-8"></script>
+<script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"
+  type="text/javascript" charset="utf-8"></script>
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"
+            type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" type="text/css"
+            href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+  <script type="text/javascript" src="config.js"></script>
+  <link rel="stylesheet" type="text/css"
+            href="style.css" />
+  
+    
+    <title>Tweet sentiment visulaisation</title>
+</head>
+<body>
+    <div id="container">
+        <div id="controlContainer">
+            <h1>Tweet sentiment visualization</h1>
+            <h3>Currently selected hashtags: #house, #dog, #car</h3>
+            <form id="addhashtag">
+                <label for="hashtags">Hashtags to add</label>
+                <input type="text" id="hashtags" name="hashtags">
+                <input type="submit" value="Add hashtags">
+            </form>
+        </div>
+        <div id="mapContainer"></div>
+    </div>
+    
+    <script type="text/javascript" src="script.js"></script>
+</body>
+</html>
