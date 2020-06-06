@@ -36,7 +36,9 @@ class MyStreamListener(tweepy.StreamListener):
 
 def on_new_client(conn, addr):
     myStream = tweepy.Stream(api.auth, MyStreamListener(conn))
-    myStream.filter(track=hashtags)
+    myStream.filter(track=hashtags, languages=['en'])
+    
+    
 
 
 
