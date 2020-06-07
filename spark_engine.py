@@ -46,7 +46,7 @@ data_stream = ssc.socketTextStream('localhost', 9009)
 
 data_stream.foreachRDD(predict_sentiment)
 
-model_path = os.getcwd() + "/model"
+model_path = os.path.join(os.getcwd(), "model") 
 print(model_path)
 model = NaiveBayesModel.load(sc, model_path)
 

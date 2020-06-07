@@ -1,6 +1,5 @@
 import tweepy
 import socket
-import threading
 import json
 from ast import literal_eval
 from flask import Flask, render_template, request, Response, send_from_directory
@@ -43,12 +42,7 @@ class MyStreamListener(tweepy.StreamListener):
 
 
 
-def on_new_client(conn, addr):
-    hashtagsTmp = conn.recv(1024).decode('utf-8')
-    hashtags = literal_eval(hashtagsTmp)
-    print(hashtags)
-    myStream = tweepy.Stream(api.auth, MyStreamListener(conn))
-    myStream.filter(track=hashtags, languages=['en'])
+    
 
 
 @app.route("/addhashtags", methods=["POST"])
@@ -65,15 +59,19 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((TCP_IP, TCP_PORT))
 s.listen(1)
 
+
+
+
+print("Waiting for TCP connection...")
+conn, addr = s.accept()
+print("Connected... Starting getting tweets.")
+
+print(hashtags)
+myStream = tweepy.Stream(api.auth, MyStreamListener(conn))
+myStream.filter(track=hashtags, languages=['en'])
+
 app.run()
 
-while True:
-    print("Waiting for TCP connection...")
-    conn, addr = s.accept()
-    print("Connected... Starting getting tweets.")
-    x = threading.Thread(target=on_new_client, args=(conn, addr))
-    x.start()
-
-s.close()
+# s.close()
 
 
