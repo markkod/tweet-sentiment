@@ -4,6 +4,7 @@ from pyspark import SparkConf, SparkContext
 from pyspark.sql import Row, SQLContext
 from pyspark.streaming import StreamingContext
 from pyspark.mllib.classification import NaiveBayes, NaiveBayesModel
+import os
 
 from utils import preprocess_row_df
 
@@ -46,4 +47,6 @@ data_stream = ssc.socketTextStream('localhost', 9009)
 
 data_stream.foreachRDD(predict_sentiment)
 
-model = NaiveBayesModel.load(sc, '/Users/mark/tweet-sentiment/model')
+model_path = os.getcwd() + "\\model"
+print(model_path)
+model = NaiveBayesModel.load(sc, model_path)
