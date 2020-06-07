@@ -52,7 +52,7 @@ def remove_special_characters(row_df):
     return row_df.withColumn('filtered', map_udf(row_df.stopwords))
 
 def create_bigrams(row_df):
-    ngram = NGram(n=2, inputCol='stopwords', outputCol='bigrams')
+    ngram = NGram(n=2, inputCol='filtered', outputCol='bigrams')
     return ngram.transform(row_df)
 
 def tfidf(row_df):
@@ -64,7 +64,8 @@ def tfidf(row_df):
     idf_df = idfModel.transform(tf_df)
 
     # Convert labels to sparse vectors, that are needed by the classifer
-    return tf_df.rdd.map(lambda row: LabeledPoint(float(row.label), Vectors.fromML(row.TF)))
+    #TODO: problem here
+    return tf_df.rdd.map(lambda row: LabeledPoint(0, Vectors.fromML(row.TF)))
 
 
 
