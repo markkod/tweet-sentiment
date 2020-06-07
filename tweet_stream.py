@@ -3,6 +3,7 @@ import socket
 import threading
 import json
 from ast import literal_eval
+from flask import Flask, render_template, request, Response, send_from_directory
 from config import consumer_key, consumer_secret, access_token, access_token_secret
 
 
@@ -11,6 +12,8 @@ hashtags = ["#sunset", "#horse", "#dogsofinstagram", "#travel", "#location", "#p
 TCP_IP = "localhost"
 TCP_PORT = 9009
 
+app = Flask(__name__)
+app.debug = True
 
 conn = None
 
@@ -46,7 +49,14 @@ def on_new_client(conn, addr):
     print(hashtags)
     myStream = tweepy.Stream(api.auth, MyStreamListener(conn))
     myStream.filter(track=hashtags, languages=['en'])
-    
+
+
+@app.route("/addhashtags", methods=["POST"])
+def addHashtags():
+    global hashtags
+    hashtags = request.json["hashtags"]
+    print(hashtags)
+    return "good"
     
 
 
@@ -54,6 +64,8 @@ def on_new_client(conn, addr):
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((TCP_IP, TCP_PORT))
 s.listen(1)
+
+app.run()
 
 while True:
     print("Waiting for TCP connection...")
@@ -63,4 +75,5 @@ while True:
     x.start()
 
 s.close()
-    
+
+
