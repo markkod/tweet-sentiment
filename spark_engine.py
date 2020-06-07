@@ -18,18 +18,19 @@ def get_sql_context_instance(spark_context):
 def predict_sentiment(time, rdd):
     print("----------- %s -----------" % str(time))
     try:
-        # Get spark sql singleton context from the current context
-        sql_context = get_sql_context_instance(rdd.context)
-        rdd.toDF().show()
-        # convert the RDD to Row RDD
-        row_rdd = rdd.map(lambda w: Row('sentence'))
-        # create a DF from the Row RDD
-        row_df = sql_context.createDataFrame(row_rdd)
-        preprocessed_df = preprocess_row_df(row_df)
-        # The actual prediction
-        #TODO: mis kujul prediction tuleb? kuidas infot saata fronti?
-        
-        model.predict(preprocessed_df).show()
+        if not rdd.isEmpty():
+            # Get spark sql singleton context from the current context
+            sql_context = get_sql_context_instance(rdd.context)
+            rdd.toDF().show()
+            # convert the RDD to Row RDD
+            row_rdd = rdd.map(lambda w: Row('sentence'))
+            # create a DF from the Row RDD
+            row_df = sql_context.createDataFrame(row_rdd)
+            preprocessed_df = preprocess_row_df(row_df)
+            # The actual prediction
+            #TODO: mis kujul prediction tuleb? kuidas infot saata fronti?
+            
+            model.predict(preprocessed_df).show()
     except:
         e = sys.exc_info()
         print("Error: %s" % str(e))
