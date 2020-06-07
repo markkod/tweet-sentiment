@@ -34,7 +34,8 @@ class MyStreamListener(tweepy.StreamListener):
                 print(status["coordinates"])
                 myobj = {'text': status["text"], 'loc':status["coordinates"]}
                 try:
-                    self.connection.sendall(json.dumps(myobj).encode('utf-8'))
+
+                    self.connection.sendall((json.dumps(myobj)+ "\n").encode('utf-8'))
                 except:
                     print("Error sending data")
                     return False
