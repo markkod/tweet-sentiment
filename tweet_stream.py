@@ -45,7 +45,9 @@ def on_new_client(conn, addr):
     hashtags = literal_eval(hashtagsTmp)
     print(hashtags)
     myStream = tweepy.Stream(api.auth, MyStreamListener(conn))
-    myStream.filter(track=hashtags)
+    myStream.filter(track=hashtags, languages=['en'])
+    
+    
 
 
 
