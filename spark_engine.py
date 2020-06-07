@@ -19,8 +19,8 @@ def predict_sentiment(time, rdd):
     print("----------- %s -----------" % str(time))
     try:
         # Get spark sql singleton context from the current context
-        rdd.print()
-        #sql_context = get_sql_context_instance(rdd.context)
+        sql_context = get_sql_context_instance(rdd.context)
+        rdd.toDF().show()
         # convert the RDD to Row RDD
         row_rdd = rdd.map(lambda w: Row('sentence'))
         # create a DF from the Row RDD
@@ -42,11 +42,14 @@ sc.setLogLevel('ERROR')
 
 ssc = StreamingContext(sc, 5)
 ssc.checkpoint('checkpoint_TwitterSentiment')
-#TODO: determine port
 data_stream = ssc.socketTextStream('localhost', 9009)
 
 data_stream.foreachRDD(predict_sentiment)
 
-model_path = os.getcwd() + "\\model"
+model_path = os.getcwd() + "/model"
 print(model_path)
 model = NaiveBayesModel.load(sc, model_path)
+
+ssc.start()
+# wait for the streaming to finish
+ssc.awaitTermination()
