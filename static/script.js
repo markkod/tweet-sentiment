@@ -2,15 +2,46 @@ const form = document.getElementById("addhashtag");
 const hashtags = document.getElementById("hashtags");
 //const current_hashtags = document.getElementById("currentHashtags");
 
+//subscribe to server events
+var source = new EventSource("/stream");
+
 form.onsubmit = addHashtag;
 
+function updateHashtags(hashtags) {
+  //send a post request with the new hashtag
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/hashtags", true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(JSON.stringify({
+      hashtags: hashtags
+  }));
+}
+
 function addHashtag(event) {
+  //get the new hashtag
   var formData = new FormData(event.target);
   var hashtags = formData.get("hashtags");
+
+  //get the current hashtag list
   const current_hashtags = document.getElementById("currentHashtags");
   var current_string = current_hashtags.innerText;
-  //current_string += hashtags;
-  console.log(current_string);
+
+
+  //add the new hashtag to the list
+  current_string += (", " + hashtags);
+  current_hashtags.innerText = current_string;
+  
+  var current_hashtag_list = current_string.split(": ");
+  current_hashtag_list = current_hashtag_list[1].split(", ");
+  console.log(current_hashtag_list);
+
+  //send a post request with the new hashtag
+  updateHashtags(current_hashtag_list);
+
+  //restart stream to start using the new hashtags
+  source = new EventSource("/stream");
+
+  //stop the form from opening a new window
   event.preventDefault();
 }
 
@@ -49,15 +80,21 @@ var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
 var ui = H.ui.UI.createDefault(map, defaultLayers);
 
 
+//get the current hashtag list and send it to the server
+const current_hashtags = document.getElementById("currentHashtags");
+var current_string = current_hashtags.innerText;
+var current_hashtag_list = current_string.split(": ");
+current_hashtag_list = current_hashtag_list[1].split(", ");
 
-//subscribe to server events
-//var source = new EventSource("/stream");
+updateHashtags(current_hashtag_list);
+
+
 
 var iconSVG = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16">' +
  '<circle r="8" cx="8" cy="8" style="fill:red;stroke:gray;stroke-width:0.1" />' +
 '</svg>';
 
-/*
+
 source.onmessage = function(event) {
     var data = event.data.substring(2, event.data.length-1);
     //var s = JSON.stringify(event.data);
@@ -71,5 +108,5 @@ source.onmessage = function(event) {
 
     map.addObject(marker);
 }
-*/
+
 

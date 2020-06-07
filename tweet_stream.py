@@ -2,12 +2,16 @@ import tweepy
 import socket
 import threading
 import json
+from ast import literal_eval
 from config import consumer_key, consumer_secret, access_token, access_token_secret
+
 
 hashtags = ["#sunset", "#horse", "#dogsofinstagram", "#travel", "#location", "#party", "#event", "#like"]
 
 TCP_IP = "localhost"
 TCP_PORT = 9009
+
+
 conn = None
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -22,19 +26,24 @@ class MyStreamListener(tweepy.StreamListener):
         
     def on_data(self, data):
         status = json.loads(data)
-        if(status["coordinates"] is not None):
-            print(status["text"])
-            print(status["coordinates"])
-            myobj = {'text': status["text"], 'loc':status["coordinates"]}
-            try:
-                self.connection.sendall(json.dumps(myobj).encode('utf-8'))
-            except:
-                print("Error sending data")
-                return False
+        if(status is not None):
+            if(status["coordinates"] is not None):
+                print(status["text"])
+                print(status["coordinates"])
+                myobj = {'text': status["text"], 'loc':status["coordinates"]}
+                try:
+                    self.connection.sendall(json.dumps(myobj).encode('utf-8'))
+                except:
+                    print("Error sending data")
+                    return False
+        
 
 
 
 def on_new_client(conn, addr):
+    hashtagsTmp = conn.recv(1024).decode('utf-8')
+    hashtags = literal_eval(hashtagsTmp)
+    print(hashtags)
     myStream = tweepy.Stream(api.auth, MyStreamListener(conn))
     myStream.filter(track=hashtags)
 

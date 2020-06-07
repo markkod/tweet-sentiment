@@ -16,14 +16,17 @@ hashtags = ["#sunset", "#horse", "#dogsofinstagram", "#travel", "#location", "#p
 
 def tweet_stream():
     print("Stream started")
+    print(hashtags)
     s = socket.socket()
     s.connect((HOST, PORT))
-    print(s)
+    # send the hashtag list and start listening
+    s.sendall(bytes(str(hashtags), 'utf-8'))
     while True:
         print("Test")
         data = s.recv(1024)
         print('Received', repr(data))
-        yield "data: {}\n\n".format(data)
+        if(len(data) != 0):
+            yield "data: {}\n\n".format(data)
 
 
 @app.route('/')
@@ -47,13 +50,13 @@ def stream():
 
 @app.route("/hashtags", methods=["GET", "POST"])
 def getHashtags():
+    global hashtags
     if request.method == "GET":
         response = {"hashtags": hashtags}
         return response
     elif request.method == "POST":
-        new_hashtag = request.form["hashtags"]
-        hashtags.append(new_hashtag)
-        print(new_hashtag)
+        hashtags = request.json["hashtags"]
+        print(hashtags)
         return "success"
 
 
