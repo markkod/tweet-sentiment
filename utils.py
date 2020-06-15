@@ -38,21 +38,21 @@ def remove_unwanted_values(values):
 
 
 def tokenize(row_df):
-    tokenizer = Tokenizer(inputCol='sentence', outputCol='sentence')
+    tokenizer = Tokenizer(inputCol='sentence', outputCol='tokenized')
     return tokenizer.transform(row_df)
 
 
 def remove_stop_words(row_df):
-    remover = StopWordsRemover(inputCol='sentence', outputCol='sentence')
+    remover = StopWordsRemover(inputCol='tokenized', outputCol='stopwords')
     return remover.transform(row_df)
 
 
 def remove_special_characters(row_df):
     map_udf = udf(remove_unwanted_values, ArrayType(StringType()))
-    return row_df.withColumn('filtered', map_udf(row_df.filtered))
+    return row_df.withColumn('filtered', map_udf(row_df.stopwords))
 
 def create_bigrams(row_df):
-    ngram = NGram(n=2, inputCol='sentence', outputCol='bigrams')
+    ngram = NGram(n=2, inputCol='filtered', outputCol='bigrams')
     return ngram.transform(row_df)
 
 def tfidf(row_df):
@@ -64,7 +64,8 @@ def tfidf(row_df):
     idf_df = idfModel.transform(tf_df)
 
     # Convert labels to sparse vectors, that are needed by the classifer
-    return tf_df.rdd.map(lambda row: LabeledPoint(float(row.label), Vectors.fromML(row.TF)))
+    #TODO: problem here
+    return tf_df.rdd.map(lambda row: LabeledPoint(0, Vectors.fromML(row.TF)))
 
 
 

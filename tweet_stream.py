@@ -25,9 +25,8 @@ class MyStreamListener(tweepy.StreamListener):
             if(status["coordinates"] is not None):
                 print(status["text"])
                 print(status["coordinates"])
-                myobj = {'text': status["text"], 'loc':status["coordinates"]}
+                myobj = {'text': status["text"], 'loc':', '.join(str(x) for x in status["coordinates"]['coordinates'])}
                 try:
-
                     self.connection.sendall((json.dumps(myobj)+ "\n").encode('utf-8'))
                 except:
                     print("Error sending data")

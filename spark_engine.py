@@ -5,6 +5,8 @@ from pyspark.sql import Row, SQLContext
 from pyspark.streaming import StreamingContext
 from pyspark.mllib.classification import NaiveBayes, NaiveBayesModel
 import os
+import json
+import pandas as pd
 
 from utils import preprocess_row_df
 
@@ -21,16 +23,14 @@ def predict_sentiment(time, rdd):
         if not rdd.isEmpty():
             # Get spark sql singleton context from the current context
             sql_context = get_sql_context_instance(rdd.context)
-            rdd.toDF().show()
-            # convert the RDD to Row RDD
-            row_rdd = rdd.map(lambda w: Row('sentence'))
-            # create a DF from the Row RDD
-            row_df = sql_context.createDataFrame(row_rdd)
-            preprocessed_df = preprocess_row_df(row_df)
-            # The actual prediction
-            #TODO: mis kujul prediction tuleb? kuidas infot saata fronti?
             
-            model.predict(preprocessed_df).show()
+            tweet_info = json.loads(str(rdd.collect()[0]))
+            df = pd.DataFrame.from_records([tweet_info])
+            df.columns = ['sentence', 'coordinates']
+            sdf = sql_context.createDataFrame(df)
+            sdf.show()
+            preprocessed_df = preprocess_row_df(sdf)
+            model.predict(preprocessed_df).collect()
     except:
         e = sys.exc_info()
         print("Error: %s" % str(e))
