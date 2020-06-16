@@ -14,8 +14,6 @@ spark = SparkSession.builder.appName("TwitterSentiment").getOrCreate()
 dataFrame = SQLContext(spark)
 
 
-
-
 def tweet_stream():
     print("Stream started")
     print(hashtags)
@@ -27,10 +25,10 @@ def tweet_stream():
 def hello():
     return render_template('dashboard.html')
 
+
 @app.route('/<path:path>')
 def send_js(path):
     return send_from_directory('templates', path)
-
 
 
 @app.route('/stream')
@@ -50,9 +48,7 @@ def getHashtags():
         return "success"
 
 
-
-
 if __name__ == '__main__':
     # create a new socket and connect to it
-    
+
     app.run(threaded=True)

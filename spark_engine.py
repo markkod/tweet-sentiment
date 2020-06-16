@@ -12,7 +12,6 @@ import requests
 from utils import preprocess_row_df
 
 def send_sentiment_prediction(pred):
-    pred['class'] = str(np.random.choice([-1, 0, 1]))
     print('Sending data: ', pred)
     requests.post('http://localhost:5000', json=json.dumps(pred))
     print('Sent.')
@@ -37,11 +36,13 @@ def predict_sentiment(time, rdd):
             df.columns = ['sentence', 'coordinates']
             sdf = sql_context.createDataFrame(df)
             preprocessed_df = preprocess_row_df(sdf)
-            #model.predict(preprocessed_df).collect()
-
-
-            # TEMP, REMOVE LATER
             pred = {}
+            # todo coordinates stuff
+            for x in preprocessed_df.collect():
+                pred['label'] = model.predict(x.features)
+        
+            # TEMP, REMOVE LATER
+            
             pred['coordinates'] = df['coordinates'][0]
             send_sentiment_prediction(pred)
 
