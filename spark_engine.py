@@ -6,9 +6,17 @@ from pyspark.streaming import StreamingContext
 from pyspark.mllib.classification import NaiveBayes, NaiveBayesModel
 import os
 import json
+import numpy as np
 import pandas as pd
-
+import requests
 from utils import preprocess_row_df
+
+def send_sentiment_prediction(pred):
+    pred['class'] = str(np.random.choice([-1, 0, 1]))
+    print('Sending data: ', pred)
+    requests.post('http://localhost:5000', json=json.dumps(pred))
+    print('Sent.')
+
 
 
 def get_sql_context_instance(spark_context):
@@ -28,9 +36,16 @@ def predict_sentiment(time, rdd):
             df = pd.DataFrame.from_records([tweet_info])
             df.columns = ['sentence', 'coordinates']
             sdf = sql_context.createDataFrame(df)
-            sdf.show()
             preprocessed_df = preprocess_row_df(sdf)
-            model.predict(preprocessed_df).collect()
+            #model.predict(preprocessed_df).collect()
+
+
+            # TEMP, REMOVE LATER
+            pred = {}
+            pred['coordinates'] = df['coordinates'][0]
+            send_sentiment_prediction(pred)
+
+            
     except:
         e = sys.exc_info()
         print("Error: %s" % str(e))
