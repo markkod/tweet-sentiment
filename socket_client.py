@@ -1,32 +1,26 @@
 import socket
 from queue import Queue
 from flask import Flask, render_template, request, Response, send_from_directory
+from pyspark.sql import SparkSession, SQLContext
 
-HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 9009        # The port used by the server
 
 app = Flask(__name__, static_url_path="", static_folder='static')
 app.debug = True
 
-queue = Queue()
 
-hashtags = ["#sunset", "#horse", "#dogsofinstagram", "#travel", "#location", "#party", "#event", "#like"]
+# get the spark app for reading data
+spark = SparkSession.builder.appName("TwitterSentiment").getOrCreate()
+
+dataFrame = SQLContext(spark)
+
 
 
 
 def tweet_stream():
     print("Stream started")
     print(hashtags)
-    s = socket.socket()
-    s.connect((HOST, PORT))
-    # send the hashtag list and start listening
-    s.sendall(bytes(str(hashtags), 'utf-8'))
     while True:
         print("Test")
-        data = s.recv(1024)
-        print('Received', repr(data))
-        if(len(data) != 0):
-            yield "data: {}\n\n".format(data)
 
 
 @app.route('/')
@@ -41,10 +35,6 @@ def send_js(path):
 
 @app.route('/stream')
 def stream():
-    # create a new socket and connect to it
-    # s = socket.socket()
-    # s.connect((HOST, PORT))
-    # print(s)
     return Response(tweet_stream(), mimetype="text/event-stream")
 
 
