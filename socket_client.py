@@ -7,7 +7,6 @@ import requests
 
 app = Flask(__name__, static_url_path="", static_folder='static')
 app.debug = True
-app.config["REDIS_URL"] = "redis://localhost"
 
 
 tweet_queue = []

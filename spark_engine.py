@@ -45,7 +45,7 @@ def predict_sentiment(time, rdd):
             coordinates, preprocessed_df = preprocess_row_df(sdf)
             
             predictions = predict(coordinates, preprocessed_df)
-            send_sentiment_prediction(pred)
+            send_sentiment_prediction(predictions)
 
     except:
         e = sys.exc_info()
