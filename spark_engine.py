@@ -23,6 +23,12 @@ def get_sql_context_instance(spark_context):
         globals()['sqlContextSingletonInstance'] = SQLContext(spark_context)
     return globals()['sqlContextSingletonInstance']
 
+def predict(coordinates, preprocessed_df):
+    pred = {}
+    for coord, x in zip(coordinates, preprocessed_df.collect()):
+        pred['label'] = model.predict(x.features)
+        pred['coordinates'] = coord
+    return pred
 
 def predict_sentiment(time, rdd):
     print("----------- %s -----------" % str(time))
@@ -35,18 +41,12 @@ def predict_sentiment(time, rdd):
             df = pd.DataFrame.from_records([tweet_info])
             df.columns = ['sentence', 'coordinates']
             sdf = sql_context.createDataFrame(df)
-            preprocessed_df = preprocess_row_df(sdf)
-            pred = {}
-            # todo coordinates stuff
-            for x in preprocessed_df.collect():
-                pred['label'] = model.predict(x.features)
-        
-            # TEMP, REMOVE LATER
+
+            coordinates, preprocessed_df = preprocess_row_df(sdf)
             
-            pred['coordinates'] = df['coordinates'][0]
+            predictions = predict(coordinates, preprocessed_df)
             send_sentiment_prediction(pred)
 
-            
     except:
         e = sys.exc_info()
         print("Error: %s" % str(e))
