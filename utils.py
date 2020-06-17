@@ -65,7 +65,8 @@ def tfidf(row_df):
 
     # Convert labels to sparse vectors, that are needed by the classifer
     coordinates = tf_df.select("coordinates").rdd.flatMap(lambda x: x).collect()
-    return coordinates, tf_df.rdd.map(lambda row: LabeledPoint(0.0, Vectors.fromML(row.TF)))
+    tweets = tf_df.select('sentence').rdd.flatMap(lambda x: x).collect()
+    return tweets, coordinates, tf_df.rdd.map(lambda row: LabeledPoint(0.0, Vectors.fromML(row.TF)))
 
 
 
