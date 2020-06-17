@@ -64,8 +64,8 @@ def tfidf(row_df):
     idf_df = idfModel.transform(tf_df)
 
     # Convert labels to sparse vectors, that are needed by the classifer
-    #TODO: problem here
-    return tf_df.rdd.map(lambda row: LabeledPoint(0, Vectors.fromML(row.TF)))
+    coordinates = tf_df.select("coordinates").rdd.flatMap(lambda x: x).collect()
+    return coordinates, tf_df.rdd.map(lambda row: LabeledPoint(0.0, Vectors.fromML(row.TF)))
 
 
 
