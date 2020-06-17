@@ -1,11 +1,14 @@
 import socket
 from flask import Flask, render_template, request, Response, send_from_directory
+from waitress import serve
 import json
 import requests
 
 
 app = Flask(__name__, static_url_path="", static_folder='static')
 app.debug = True
+app.config["REDIS_URL"] = "redis://localhost"
+
 
 tweet_queue = []
 
@@ -64,4 +67,5 @@ def getHashtags():
 
 
 if __name__ == '__main__':
-    app.run(threaded=True, port=5001)
+    #app.run(threaded=True, port=5001)
+    serve(app, host="0.0.0.0", port=5001)
