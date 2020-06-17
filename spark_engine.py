@@ -24,12 +24,14 @@ def get_sql_context_instance(spark_context):
     return globals()['sqlContextSingletonInstance']
 
 def predict(tweets, coordinates, preprocessed_df):
-    pred = {}
+    predictions = []
     for tweet, coord, x in zip(tweets, coordinates, preprocessed_df.collect()):
+        pred = {}
         pred['tweet'] = tweet
         pred['label'] = model.predict(x.features)
         pred['coordinates'] = coord
-    return pred
+        predictions.append(pred)
+    return predictions
 
 def predict_sentiment(time, rdd):
     print("----------- %s -----------" % str(time))
