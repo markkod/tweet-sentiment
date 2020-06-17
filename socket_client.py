@@ -36,9 +36,10 @@ def newData():
     global tweet_queue
     print(request.json)
     json_data = json.loads(request.json)
-    label = json_data["label"]
-    coordinates = json_data["coordinates"]
-    tweet_queue.append(json_data)
+    for tweet in json_data:
+        label = tweet["label"]
+        coordinates = tweet["coordinates"]
+        tweet_queue.append(tweet)
 
     print("Got label {0} with coordinates {1}".format(label, coordinates))
 
