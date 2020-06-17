@@ -7,6 +7,8 @@ var source = new EventSource("/stream");
 
 form.onsubmit = addHashtag;
 
+var group = new H.map.Group();
+
 function updateHashtags(hashtags) {
   //send a post request with the new hashtag
   var xhr = new XMLHttpRequest();
@@ -73,6 +75,19 @@ var map = new H.Map(
       pixelRatio: window.devicePixelRatio || 1
     });
 
+map.addObject(group);
+
+group.addEventListener('tap', function (evt) {
+  // event target is the marker itself, group is a parent event target
+  // for all objects that it contains
+  var bubble =  new H.ui.InfoBubble(evt.target.getGeometry(), {
+    // read custom data
+    content: evt.target.getData()
+  });
+  // show info bubble
+  ui.addBubble(bubble);
+}, false);
+
 // add a resize listener to make sure that the map occupies the whole container
 window.addEventListener('resize', () => map.getViewPort().resize());
 
@@ -92,6 +107,7 @@ var current_hashtag_list = current_string.split(": ");
 current_hashtag_list = current_hashtag_list[1].split(", ");
 
 updateHashtags(current_hashtag_list);
+
 
 
 
@@ -123,8 +139,8 @@ source.onmessage = function(event) {
     var icon = new H.map.Icon(iconSVG1 + color + iconSVG2);
 
     var marker = new H.map.Marker(coords, {icon: icon});
-
-    map.addObject(marker);
+    marker.setData("<div>" + a.tweet + "</div>");
+    group.addObject(marker);
 }
 
 
