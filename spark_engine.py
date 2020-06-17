@@ -23,9 +23,10 @@ def get_sql_context_instance(spark_context):
         globals()['sqlContextSingletonInstance'] = SQLContext(spark_context)
     return globals()['sqlContextSingletonInstance']
 
-def predict(coordinates, preprocessed_df):
+def predict(tweets, coordinates, preprocessed_df):
     pred = {}
-    for coord, x in zip(coordinates, preprocessed_df.collect()):
+    for tweet, coord, x in zip(tweets, coordinates, preprocessed_df.collect()):
+        pred['tweet'] = tweet
         pred['label'] = model.predict(x.features)
         pred['coordinates'] = coord
     return pred
@@ -42,9 +43,9 @@ def predict_sentiment(time, rdd):
             df.columns = ['sentence', 'coordinates']
             sdf = sql_context.createDataFrame(df)
 
-            coordinates, preprocessed_df = preprocess_row_df(sdf)
-            
-            predictions = predict(coordinates, preprocessed_df)
+            tweets, coordinates, preprocessed_df = preprocess_row_df(sdf)
+
+            predictions = predict(tweets, coordinates, preprocessed_df)
             send_sentiment_prediction(predictions)
 
     except:
@@ -57,7 +58,7 @@ conf.setAppName("TwitterSentiment")
 sc = SparkContext(conf=conf)
 sc.setLogLevel('ERROR')
 
-ssc = StreamingContext(sc, 5)
+ssc = StreamingContext(sc, 1)
 ssc.checkpoint('checkpoint_TwitterSentiment')
 data_stream = ssc.socketTextStream('localhost', 9009)
 
