@@ -13,7 +13,7 @@ from utils import preprocess_row_df
 
 def send_sentiment_prediction(pred):
     print('Sending data: ', pred)
-    requests.post('http://localhost:5000', json=json.dumps(pred))
+    requests.post('http://localhost:5001/data', json=json.dumps(pred))
     print('Sent.')
 
 

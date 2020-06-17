@@ -1,25 +1,26 @@
 import socket
-from queue import Queue
 from flask import Flask, render_template, request, Response, send_from_directory
-from pyspark.sql import SparkSession, SQLContext
+from waitress import serve
+import json
+import requests
 
 
 app = Flask(__name__, static_url_path="", static_folder='static')
 app.debug = True
+app.config["REDIS_URL"] = "redis://localhost"
 
 
-# get the spark app for reading data
-spark = SparkSession.builder.appName("TwitterSentiment").getOrCreate()
+tweet_queue = []
 
-dataFrame = SQLContext(spark)
-
+hashtags = []
 
 def tweet_stream():
     print("Stream started")
-    print(hashtags)
     while True:
-        print("Test")
-
+        if(len(tweet_queue) > 0):
+            tweet_data = json.dumps(tweet_queue.pop(0))
+            print(tweet_data)
+            yield "data: {}\n\n".format(tweet_data)
 
 @app.route('/')
 def hello():
@@ -29,6 +30,22 @@ def hello():
 @app.route('/<path:path>')
 def send_js(path):
     return send_from_directory('templates', path)
+
+
+@app.route("/data", methods=["POST"])
+def newData():
+    global tweet_queue
+    print(request.json)
+    json_data = json.loads(request.json)
+    label = json_data["label"]
+    coordinates = json_data["coordinates"]
+    tweet_queue.append(json_data)
+
+    print("Got label {0} with coordinates {1}".format(label, coordinates))
+
+    return "Got data"
+
+
 
 
 @app.route('/stream')
@@ -44,11 +61,11 @@ def getHashtags():
         return response
     elif request.method == "POST":
         hashtags = request.json["hashtags"]
+        requests.post('http://localhost:5000/addhashtags', json=request.json)
         print(hashtags)
         return "success"
 
 
 if __name__ == '__main__':
-    # create a new socket and connect to it
-
-    app.run(threaded=True)
+    #app.run(threaded=True, port=5001)
+    serve(app, host="0.0.0.0", port=5001)

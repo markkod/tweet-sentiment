@@ -20,15 +20,20 @@ function updateHashtags(hashtags) {
 function addHashtag(event) {
   //get the new hashtag
   var formData = new FormData(event.target);
-  var hashtags = formData.get("hashtags");
+  var newHashtag = formData.get("hashtags");
 
   //get the current hashtag list
   const current_hashtags = document.getElementById("currentHashtags");
   var current_string = current_hashtags.innerText;
 
 
+  // check if added hashtag has hash symbol, if not add it
+  if(newHashtag[0] != "#") {
+    newHashtag = "#"+newHashtag;
+  }
+
   //add the new hashtag to the list
-  current_string += (", " + hashtags);
+  current_string += (", " + newHashtag);
   current_hashtags.innerText = current_string;
   
   var current_hashtag_list = current_string.split(": ");
@@ -90,19 +95,32 @@ updateHashtags(current_hashtag_list);
 
 
 
-var iconSVG = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16">' +
- '<circle r="8" cx="8" cy="8" style="fill:red;stroke:gray;stroke-width:0.1" />' +
-'</svg>';
+var iconSVG1 = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16">' +
+ '<circle r="8" cx="8" cy="8" style="fill:'
+ 
+ var iconSVG2 = ';stroke:gray;stroke-width:0.1"/></svg>';
 
 
 source.onmessage = function(event) {
-    var data = event.data.substring(2, event.data.length-1);
+    //var data = event.data;
     //var s = JSON.stringify(event.data);
-    console.log(data);
-    var a = JSON.parse(data);
-    var coords = {lat: a.loc.coordinates[1], lng: a.loc.coordinates[0]};
+    console.log(event.data);
+    var a = JSON.parse(event.data);
+    var coordList = a.coordinates.split(", ");
+    var coords = {lat: coordList[1], lng: coordList[0]};
 
-    var icon = new H.map.Icon(iconSVG);
+    var color = "red";
+    if(a.label == 1.0) {
+      color = "green";
+    }
+    else if(a.label == 0.0) {
+      color = "blue";
+    }
+    else if(a.label == -1.0) {
+      color = "red";
+    }
+
+    var icon = new H.map.Icon(iconSVG1 + color + iconSVG2);
 
     var marker = new H.map.Marker(coords, {icon: icon});
 

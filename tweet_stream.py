@@ -1,6 +1,7 @@
 import tweepy
 import socket
 import json
+import random
 from ast import literal_eval
 from flask import Flask, render_template, request, Response, send_from_directory
 from config import consumer_key, consumer_secret, access_token, access_token_secret
@@ -20,12 +21,19 @@ class MyStreamListener(tweepy.StreamListener):
         self.connection = conn
         
     def on_data(self, data):
+        fakeLocation = True # add dummy location to tweets without location
         status = json.loads(data)
         if(status is not None):
-            if(status["coordinates"] is not None):
+            if(status["coordinates"] is not None) or (fakeLocation is True):
+                if(status["coordinates"] is None):
+                    lat = random.randint(-90, 90)
+                    lon = random.randint(-180, 180)
+                    status["coordinates"] = dict()
+                    status["coordinates"]["coordinates"] = [lon, lat]
                 print(status["text"])
                 print(status["coordinates"])
                 myobj = {'text': status["text"], 'loc':', '.join(str(x) for x in status["coordinates"]['coordinates'])}
+
                 try:
                     self.connection.sendall((json.dumps(myobj)+ "\n").encode('utf-8'))
                 except:
