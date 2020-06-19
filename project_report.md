@@ -25,10 +25,10 @@ Then our twitter stream is sent to our Spark engine over a socket connection. Th
 
 ### Displaying sentiment
 
-After the tweets have been given labels, then they are batched and sent to the client that displays the sentiments based on coordinates on a map. These sentiments are not sent over a socket connection, but rather with a simple HTTP POST request. 
+After the tweets have been given labels, then they are batched and sent to the client that displays the sentiments based on coordinates on a map. These sentiments are not sent over a socket connection, but rather with a simple HTTP POST request. The server uses Javascript eventstream API to send the Tweets to the browser in real time as they arrive. Eventsource API was chosen for this because it is a native Javascript API that is supported by most modern browsers without any external libraries. 
 
 ### Visualization
-
+To visualize the Tweets HERE maps API was used, we chose the HERE maps API since it is free to use and provides all the features we need for this project. The API is also very easy to use and implement. The Javascript API from HERE maps was used to display a map for the user and to add markers to the map that correspond to Tweet locations. These markers are made up of SVG assets thta can be easily modified to represent different sentiments of the tweets. 
 
 ### Deployment
 
