@@ -38,4 +38,6 @@ The project is deployed on a DigitalOcean server. The application is run by crea
 
 I think if we had more time then we could have developed a better model or at least have tried some other pretrained models, as the sentiment accuracy was quite low. Another thing that we would have liked to have done better would be the visualization of tweets as there was some lag between the client receiving tweets and the client showing them, but we could not figure out why this was happening. What is more, then we currently do not retrain our model with incoming tweets and this can be improved by using Apache Airflow. 
 
+Regarding Spark, then an additional improvement could be by batching tweets using bigger windows, as we saw that the amount of tweets that come using this use case is relatively small, then when we would have tweets coming at a greater intensity then it would be more beneficial to group them using bigger windows. Currently the tweets are read from the socket text stream in a 1 second interval and directly processed.
+
 Another point of improvement would be to Dockerize the application as we faced significant issues in managing the different Python and Java versions in the remote server. Docker would eliminate such issues by default. 
